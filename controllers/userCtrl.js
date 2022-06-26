@@ -6,8 +6,15 @@ const jwt = require('jsonwebtoken');
 const sendEmailGrid = require('./mailSendGrid');
 const schedule = require('node-schedule');
 
+const Nexmo = require('nexmo');
+
+const vonage = new Nexmo({
+  apiKey: '16009c5b',
+  apiSecret: '8fuJHdbGpf5PGgEx',
+});
+
 // const date = new Date(2022, 06, 26, 19, 53, 0);
-schedule.scheduleJob('*/2 * * * *', () => {
+schedule.scheduleJob('*/1 * * * *', () => {
   msgTable.find({ isStatus: false }, (err, reminderList) => {
     console.log(reminderList);
     if (err) {
@@ -16,12 +23,17 @@ schedule.scheduleJob('*/2 * * * *', () => {
     if (reminderList) {
       reminderList.forEach((reminder) => {
         if (!reminder.isStatus) {
-          console.log(reminder._id + ' ' + reminder.isStatus);
-          const now = new Date();
-          if (
-            now - new Date(reminder.sendTime) == 1 ||
-            now - new Date(reminder.sendTime) == 0
-          ) {
+          // const now = new Date();
+          // console.log(reminder._id + ' ' + (new Date(reminder.sendTime) - now));
+
+          const date1 = new Date();
+          const date2 = new Date(reminder.sendTime);
+          const diffTime = date2 - date1;
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+          console.log(diffDays + '  ' + reminder._id);
+          // diffDays == 1 || diffDays == 0
+          if (diffDays >= 0 && diffDays <= 2) {
             msgTable.findByIdAndUpdate(
               reminder._id,
               { isStatus: true },
@@ -30,7 +42,28 @@ schedule.scheduleJob('*/2 * * * *', () => {
                   console.log(err);
                 }
                 // const user = employeeTable.findOne({ userId: reminder.userId });
-                // console.log(user);
+
+                // const from = 'Small Talk';
+                // const to = '917063639726';
+                // const text =
+                //   'you got a new message from ' +
+                //   reminder.userName +
+                //   ' | Small Talk';
+                // vonage.message.sendSms(from, to, text, (err, responseData) => {
+                //   if (err) {
+                //     console.log(err);
+                //   } else {
+                //     if (responseData.messages[0]['status'] === '0') {
+                //       console.log('Message sent successfully.');
+                //     } else {
+                //       console.log(
+                //         `Message failed with error: ${responseData.messages[0]['error-text']}`
+                //       );
+                //     }
+                //   }
+                // });
+
+                console.log(reminder.title);
                 sendEmailGrid(
                   reminder.userName,
                   reminder.email,
