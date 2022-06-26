@@ -8,11 +8,6 @@ const schedule = require('node-schedule');
 
 const Nexmo = require('nexmo');
 
-const vonage = new Nexmo({
-  apiKey: '16009c5b',
-  apiSecret: '8fuJHdbGpf5PGgEx',
-});
-
 // const date = new Date(2022, 06, 26, 19, 53, 0);
 schedule.scheduleJob('*/1 * * * *', () => {
   msgTable.find({ isStatus: false }, (err, reminderList) => {
@@ -41,27 +36,6 @@ schedule.scheduleJob('*/1 * * * *', () => {
                 if (err) {
                   console.log(err);
                 }
-                // const user = employeeTable.findOne({ userId: reminder.userId });
-
-                // const from = 'Small Talk';
-                // const to = '917063639726';
-                // const text =
-                //   'you got a new message from ' +
-                //   reminder.userName +
-                //   ' | Small Talk';
-                // vonage.message.sendSms(from, to, text, (err, responseData) => {
-                //   if (err) {
-                //     console.log(err);
-                //   } else {
-                //     if (responseData.messages[0]['status'] === '0') {
-                //       console.log('Message sent successfully.');
-                //     } else {
-                //       console.log(
-                //         `Message failed with error: ${responseData.messages[0]['error-text']}`
-                //       );
-                //     }
-                //   }
-                // });
 
                 console.log(reminder.title);
                 sendEmailGrid(
